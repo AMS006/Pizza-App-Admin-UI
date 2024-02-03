@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { login, self, logoutUser } from "../../http/api";
 import { useAuth } from "../../store";
 import { usePermission } from "../../hooks/usePermission";
+import { AxiosError } from "axios";
 
 
 const LoginPage = () => {
@@ -48,7 +49,7 @@ const LoginPage = () => {
                     bordered={false}
                     title={<Space style={{ width: '100%', fontSize: 18, justifyContent: 'center' }}><LockFilled /> Sign In</Space>}
                 >
-                    {isError && <Alert message={error.message} type="error" showIcon style={{ marginBottom: '12px' }} />}
+                    {isError && error instanceof AxiosError && <Alert message={error.response?.data?.errors[0].message} type="error" showIcon style={{ marginBottom: '12px' }} />}
                     <Form
                         onFinish={(values) => {
                             mutate({ email: values.username, password: values.password })
