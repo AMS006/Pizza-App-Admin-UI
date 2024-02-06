@@ -10,4 +10,11 @@ interface User {
     firstName: string,
     lastName: string,
     role: string,
+    tenant: Tenant
+}
+
+interface Tenant {
+    id: number,
+    name: string,
+    address: string
 }

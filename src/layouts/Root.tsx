@@ -22,7 +22,7 @@ const Root = () => {
 
     useEffect(() => {
         if (data) {
-            setUser(data.data);
+            setUser(data);
         }
     }, [data, setUser]);
 
