@@ -11,3 +11,7 @@ export const self = async () => {
 export const logoutUser = async () => {
     return api.post('/auth/logout');
 }
+
+export const getAllUsers = async() =>{
+    return api.get('/users');
+}

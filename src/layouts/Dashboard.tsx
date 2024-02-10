@@ -8,27 +8,34 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { logoutUser } from '../http/api';
 
-const items = [
-    {
-        key: '/',
-        icon: <HomeOutlined />,
-        label: <NavLink to='/'>Home</NavLink>,
-    },
-    {
-        key: '/users',
-        label: <NavLink to='/users'>Users</NavLink>,
-        icon: <UserOutlined />,
 
 
-    },
+const getItems = (role: string) => {
+    const commonItems = [
+        {
+            key: '/',
+            icon: <HomeOutlined />,
+            label: <NavLink to='/'>Home</NavLink>,
+        },
 
+    ];
+    if (role === 'admin') {
+        return [
+            ...commonItems,
+            {
+                key: '/users',
+                icon: <UserOutlined />,
+                label: <NavLink to='/users'>Users</NavLink>,
+            }
+        ]
+    }
 
-]
-
-
+    return commonItems;
+}
 
 const Dashboard = () => {
     const { user, logout } = useAuth();
+    const items = getItems(user?.role || '');
     const { mutate: logoutMutate } = useMutation({
         mutationKey: ['logout'],
         mutationFn: logoutUser,
@@ -76,7 +83,7 @@ const Dashboard = () => {
                         <Space size={16}>
                             <BellOutlined style={{ fontSize: '18px' }} />
                             <Dropdown menu={{ items: dropdownItems }} placement="bottomRight">
-                                <Avatar size='large' style={{ cursor: 'pointer' }}>{user.firstName.charAt(0)}</Avatar>
+                                <Avatar>{user.firstName.charAt(0)}</Avatar>
                             </Dropdown>
                         </Space>
                     </Flex>

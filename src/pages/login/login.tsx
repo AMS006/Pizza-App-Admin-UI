@@ -15,8 +15,7 @@ const LoginPage = () => {
         queryKey: ['self'],
         queryFn: self,
         enabled: false,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
+        
     });
 
     const { mutate: logoutMutate } = useMutation({
