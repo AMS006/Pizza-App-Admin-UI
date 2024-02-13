@@ -12,6 +12,18 @@ export const logoutUser = async () => {
     return api.post('/auth/logout');
 }
 
-export const getAllUsers = async() =>{
-    return api.get('/users');
+export const getAllUsers = async (query: string) => {
+    return api.get(`/users?${query}`);
+}
+
+export const getAllTenants = async (query: string) => {
+    return api.get(`/tenants?${query}`);
+}
+
+export const createUser = async (user: User) => {
+    return api.post('/users', user);
+}
+
+export const createTenant = async (tenant: Tenant) => {
+    return api.post('/tenants', tenant);
 }

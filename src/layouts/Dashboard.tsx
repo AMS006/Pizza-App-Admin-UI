@@ -3,10 +3,14 @@ import { useAuth } from '../store';
 import { Avatar, Badge, Dropdown, Flex, Layout, Menu, Space, theme } from 'antd';
 import { Content, Footer, Header } from 'antd/es/layout/layout';
 import Sider from 'antd/es/layout/Sider';
-import { HomeOutlined, UserOutlined, BellOutlined } from '@ant-design/icons';
+import { BellOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { logoutUser } from '../http/api';
+import { FoodIcon, HomeIcon, UserIcon } from '../components/Icons';
+import Icon from '@ant-design/icons';
+
+
 
 
 
@@ -14,7 +18,7 @@ const getItems = (role: string) => {
     const commonItems = [
         {
             key: '/',
-            icon: <HomeOutlined />,
+            icon: <Icon component={HomeIcon} />,
             label: <NavLink to='/'>Home</NavLink>,
         },
 
@@ -24,8 +28,13 @@ const getItems = (role: string) => {
             ...commonItems,
             {
                 key: '/users',
-                icon: <UserOutlined />,
+                icon: <Icon component={UserIcon} />,
                 label: <NavLink to='/users'>Users</NavLink>,
+            },
+            {
+                key: '/restaurants',
+                icon: <Icon component={FoodIcon} />,
+                label: <NavLink to='/restaurants'>Restaurants</NavLink>,
             }
         ]
     }

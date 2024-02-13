@@ -18,3 +18,13 @@ interface Tenant {
     name: string,
     address: string
 }
+
+interface ErrorResponse {
+    errors: {
+        location: string;
+        message: string;
+        path: string;
+        type: string;
+    }[];
+}
+
