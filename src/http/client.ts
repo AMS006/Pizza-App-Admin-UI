@@ -18,7 +18,7 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         const headers = { ...originalRequest.headers }
-        console.log('error', error.response.status)
+      
         if (error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             await refreshToken();

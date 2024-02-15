@@ -4,7 +4,6 @@ const NonAuth = () => {
     const { user } = useAuth();
 
     if (user !== null) {
-        console.log("Navigated")
         return <Navigate to="/" replace />
     }
     return (

@@ -2,11 +2,12 @@ import { Breadcrumb, Button, Drawer, Form, Row, Space, Spin, Table, theme } from
 import { Link } from "react-router-dom"
 import { RightOutlined, PlusOutlined } from '@ant-design/icons';
 import TenantsFilters from "./TenantsFilters";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import TenantForm from "./form/TenantForm";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createTenant, getAllTenants } from "../../http/api";
 import { useForm } from "antd/es/form/Form";
+import { debounce } from "lodash";
 
 const columns = [
     {
@@ -31,7 +32,8 @@ const TenantsPage = () => {
     const queryClient = useQueryClient();
     const [queryParams, setQueryParams] = useState({
         page: '1',
-        limit: '6'
+        limit: '6',
+        search: '',
     })
     const { data, isFetching } = useQuery({
         queryKey: ['tenants', queryParams],
@@ -59,6 +61,16 @@ const TenantsPage = () => {
         await form.validateFields();
         mutate(form.getFieldsValue());
     }
+
+    const debouncedQUpdate = useMemo(() => {
+        return debounce((value: string) => {
+            setQueryParams((prev) => ({ ...prev, search: value, page: '1' }));
+        }, 500);
+    }, []);
+
+    const onFilterChange = (value: FilterValues) => {
+        debouncedQUpdate(value.search || '');
+    }
     return (
         <div>
             <Row justify={'space-between'}>
@@ -69,14 +81,14 @@ const TenantsPage = () => {
                 />
                 <Spin spinning={isFetching} />
             </Row>
-            <TenantsFilters >
-                <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>Create Restaurant</Button>
-            </TenantsFilters>
-
+            <Form onValuesChange={(value: FilterValues) => onFilterChange(value)}>
+                <TenantsFilters >
+                    <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>Create Restaurant</Button>
+                </TenantsFilters>
+            </Form>
             <Table
                 dataSource={data?.data?.tenants || []}
                 columns={columns}
-
                 rowKey="id"
                 pagination={{
                     current: parseInt(queryParams.page),

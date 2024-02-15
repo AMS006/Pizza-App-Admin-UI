@@ -1,4 +1,4 @@
-import { Card, Row, Col, Flex, Input, Select, } from 'antd'
+import { Card, Row, Col, Flex, Input, Select, Form, } from 'antd'
 const roles = [
     {
         value: "admin",
@@ -13,16 +13,7 @@ const roles = [
         label: "Customer"
     }
 ]
-const status = [
-    {
-        value: "active",
-        label: "Active"
-    },
-    {
-        value: "banned",
-        label: "Banned"
-    }
-];
+
 type UserFiltersProps = {
     children: React.ReactNode
 }
@@ -32,28 +23,21 @@ const UserFilters = ({ children }: UserFiltersProps) => {
             <Row justify={'space-between'} >
                 <Col>
                     <Flex gap={6}>
-                        <Input.Search
-                            allowClear={true}
-                            placeholder="Search..."
+                        <Form.Item name={'search'}>
+                            <Input.Search
+                                allowClear={true}
+                                placeholder="Search..."
+                            />
+                        </Form.Item>
+                        <Form.Item name={'role'}>
+                            <Select
+                                allowClear={true}
+                                style={{ width: '100%' }}
+                                options={roles}
+                                placeholder='Select Role'
+                            />
+                        </Form.Item>
 
-                        // onChange={() => ()}
-                        />
-                        <Select
-                            allowClear={true}
-                            style={{ width: '100%' }}
-                            options={roles}
-                            placeholder='Select Role'
-
-                        // onChange={(value) =>()}
-                        />
-                        <Select
-                            allowClear={true}
-                            style={{ width: '100%' }}
-                            options={status}
-                            placeholder='Select Status'
-
-                        // onChange={(value) => onFilterChange('status', value)}
-                        />
                     </Flex>
                 </Col>
                 <Col>

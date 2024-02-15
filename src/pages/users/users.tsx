@@ -1,16 +1,16 @@
-import { Breadcrumb, Button, Drawer, Form, Row, Space, Spin, Table, message, theme } from "antd"
-import { Link, Navigate } from "react-router-dom"
+import { Breadcrumb, Button, Drawer, Form, Row, Space, Spin, Table, message, theme } from "antd";
+import { Link, Navigate } from "react-router-dom";
 import { RightOutlined } from '@ant-design/icons';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createUser, getAllUsers } from "../../http/api";
+import { createUser, getAllUsers, updateUser } from "../../http/api";
 import UserFilters from "./UserFilters";
 import { useAuth } from "../../store";
-import { useState } from "react";
-import { PlusOutlined } from '@ant-design/icons'
+import { useMemo, useState } from "react";
+import { PlusOutlined } from '@ant-design/icons';
 import UserForm from "./form/UserForm";
 import { useForm } from "antd/es/form/Form";
 import { AxiosError } from "axios";
-
+import { debounce } from "lodash";
 
 const columns = [
     {
@@ -36,19 +36,38 @@ const columns = [
         key: 'email',
     },
     {
+        title: "Restaurant",
+        dataIndex: 'restaurant',
+        key: 'restaurant',
+        render: (_: string, record: User) => {
+            return (
+                <div>
+                    {record.tenant?.name}
+                </div>
+            );
+        },
+    },
+    {
         title: 'Role',
         dataIndex: 'role',
         key: 'role',
     },
 ];
 
+
 const UsersPage = () => {
     const [open, setOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [form] = useForm();
+    const [filterForm] = useForm();
+
+
     const queryClient = useQueryClient();
     const [queryParams, setQueryParams] = useState({
         page: '1',
-        limit: '6'
+        limit: '6',
+        search: '',
+        role: ''
     })
 
     const [messageApi, contextHolder] = message.useMessage();
@@ -60,7 +79,7 @@ const UsersPage = () => {
         },
         placeholderData: keepPreviousData
     });
-    const { mutate, isPending } = useMutation({
+    const { mutate: createUserMutate, isPending: creatingUser } = useMutation({
         mutationKey: ['createUser'],
         mutationFn: async (data: User) => createUser(data).then((res) => res.data),
         onSuccess: () => {
@@ -73,7 +92,31 @@ const UsersPage = () => {
                 messageApi.error((error.response?.data as ErrorResponse)?.errors[0].message);
             }
         }
-    })
+    });
+
+    const { mutate: updateUserMutate, isPending: updatingUser } = useMutation({
+        mutationKey: ['updateUser'],
+        mutationFn: async (data: User) => updateUser(data).then((res) => res.data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['allUsers'] });
+            setOpen(false);
+            setSelectedUser(null);
+            form.resetFields();
+        },
+        onError: (error: AxiosError) => {
+            if (error instanceof AxiosError) {
+                messageApi.error((error.response?.data as ErrorResponse)?.errors[0].message);
+            }
+        }
+    });
+
+
+
+    const debouncedQUpdate = useMemo(() => {
+        return debounce((value: string) => {
+            setQueryParams((prev) => ({ ...prev, search: value, page: '1' }));
+        }, 500);
+    }, []);
 
     const { user } = useAuth();
     const {
@@ -85,9 +128,32 @@ const UsersPage = () => {
     }
     const handleSubmit = async () => {
         await form.validateFields();
-        mutate(form.getFieldsValue());
+        const isEditing = !!selectedUser;
+
+        if (isEditing) {
+            let tenantId = undefined;
+            if (form.getFieldValue('role') === 'manager')
+                tenantId = form.getFieldValue('tenantId');
+
+            console.log(tenantId)
+            const data = form.getFieldsValue();
+            const payload = { ...data, tenantId: tenantId, id: selectedUser?.id };
+            console.log(payload)
+            updateUserMutate(payload);
+        }
+        else {
+            createUserMutate(form.getFieldsValue());
+        }
     }
 
+    const onFilterChange = (changedValues: FilterValues) => {
+
+        if ('search' in changedValues) {
+            debouncedQUpdate(changedValues.search || '');
+        } else {
+            setQueryParams((prev) => ({ ...prev, ...changedValues, page: '1' }));
+        }
+    }
 
     return (
         <div>
@@ -100,13 +166,35 @@ const UsersPage = () => {
                 />
                 <Spin spinning={isFetching} />
             </Row>
-            <UserFilters>
-                <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>Create User</Button>
-            </UserFilters>
+            <Form
+                form={filterForm}
+                onValuesChange={onFilterChange}
+            >
+                <UserFilters>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>Create User</Button>
+                </UserFilters>
+            </Form>
             <Table
                 dataSource={data?.data?.users || []}
                 style={{ margin: '16px 0px' }}
-                columns={columns}
+                columns={[...columns, {
+                    title: 'Action',
+                    key: 'action',
+                    render: (_text: string, record: User) => {
+                        return (
+                            <Space>
+                                <Button
+                                    type="link"
+                                    onClick={() => {
+                                        setSelectedUser(record);
+                                        setOpen(true);
+                                        form.setFieldsValue({ ...record, tenantId: record.tenant?.id });
+                                    }}
+                                >Edit</Button>
+                            </Space>
+                        );
+                    },
+                }]}
                 rowKey={'id'}
                 pagination={
                     {
@@ -116,34 +204,33 @@ const UsersPage = () => {
                         showSizeChanger: true,
                         pageSizeOptions: ['6', '10', '20', '30', '40', '50'],
                         onChange: (page, pageSize) => {
-                            console.log(page, pageSize)
+
                             setQueryParams({ ...queryParams, page: page.toString(), limit: pageSize.toString() })
                         }
                     }
                 }
             />
             <Drawer
-                title="Create a new user"
+                title={selectedUser ? "Edit User" : "Create a new user"}
                 placement="right"
                 destroyOnClose={true}
                 closable={true}
-                onClose={() => { setOpen(false); form.resetFields() }}
+                onClose={() => { setOpen(false); form.resetFields(); setSelectedUser(null) }}
                 styles={{ body: { background: colorBgLayout } }}
                 open={open}
                 width={720}
                 extra={
                     <Space>
                         <Button onClick={() => { setOpen(false); form.resetFields() }}>Cancel</Button>
-                        <Button type="primary" onClick={handleSubmit} loading={isPending}>Submit</Button>
+                        <Button type="primary" onClick={handleSubmit} loading={creatingUser || updatingUser}>Submit</Button>
                     </Space>
                 }
 
             >
 
                 <Form layout="vertical" form={form}>
-                    <UserForm />
+                    <UserForm isEditing={!!selectedUser} role={selectedUser?.role} />
                 </Form>
-
             </Drawer>
         </div>
     )

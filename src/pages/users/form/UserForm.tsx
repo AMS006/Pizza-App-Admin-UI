@@ -1,16 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, Col, Form, Input, Row, Select, Space } from "antd"
 import { getAllTenants } from "../../../http/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const UserForm = () => {
+
+const UserForm = ({ isEditing = false, role }: { isEditing: boolean, role?: string }) => {
     const { data, isLoading } = useQuery({
         queryKey: ['tenants'],
-        queryFn: () =>{
+        queryFn: () => {
             return getAllTenants('');
         },
     });
     const [selectedRole, setSelectedRole] = useState<string>('');
+    useEffect(() => {
+
+        if (role) {
+            setSelectedRole(role);
+        }
+    }, [role])
+
     return (
         <Row>
             <Col span={24}>
@@ -36,7 +44,7 @@ const UserForm = () => {
                                     <Input />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
+                            {!isEditing && <Col span={12}>
                                 <Form.Item
                                     label="Email"
                                     name="email"
@@ -45,7 +53,7 @@ const UserForm = () => {
                                 >
                                     <Input />
                                 </Form.Item>
-                            </Col>
+                            </Col>}
                         </Row>
                     </Card>
 
@@ -71,11 +79,10 @@ const UserForm = () => {
                                     rules={[{ required: true, message: 'Role is required' }]}
                                 >
                                     <Select placeholder='Select Tenant' loading={isLoading}>
-                                        {data?.data.map((tenant: Tenant) => (
+                                        {data?.data?.tenants.map((tenant: Tenant) => (
                                             <Select.Option
                                                 key={tenant.id}
                                                 value={tenant.id}
-
                                             >
                                                 {tenant.name}
                                             </Select.Option>
@@ -85,7 +92,7 @@ const UserForm = () => {
                             </Col>}
                         </Row>
                     </Card>
-                    <Card title='Security Info'>
+                    {!isEditing && <Card title='Security Info'>
                         <Row gutter={12}>
                             <Col span={12}>
                                 <Form.Item
@@ -97,7 +104,7 @@ const UserForm = () => {
                                 </Form.Item>
                             </Col>
                         </Row>
-                    </Card>
+                    </Card>}
                 </Space>
             </Col>
         </Row>

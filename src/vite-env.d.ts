@@ -28,3 +28,7 @@ interface ErrorResponse {
     }[];
 }
 
+interface FilterValues {
+    search?: string;
+    role?: string;
+}

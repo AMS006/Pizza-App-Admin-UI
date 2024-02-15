@@ -24,6 +24,11 @@ export const createUser = async (user: User) => {
     return api.post('/users', user);
 }
 
+
+export const updateUser = async (user: User) => {
+    return api.patch(`/users/${user.id}`, user);
+}
+
 export const createTenant = async (tenant: Tenant) => {
     return api.post('/tenants', tenant);
 }

@@ -11,9 +11,6 @@ import { FoodIcon, HomeIcon, UserIcon } from '../components/Icons';
 import Icon from '@ant-design/icons';
 
 
-
-
-
 const getItems = (role: string) => {
     const commonItems = [
         {
@@ -38,13 +35,13 @@ const getItems = (role: string) => {
             }
         ]
     }
-
     return commonItems;
 }
 
 const Dashboard = () => {
     const { user, logout } = useAuth();
     const items = getItems(user?.role || '');
+    const { pathname } = useLocation();
     const { mutate: logoutMutate } = useMutation({
         mutationKey: ['logout'],
         mutationFn: logoutUser,
@@ -61,7 +58,8 @@ const Dashboard = () => {
             }
         }
     ]
-    const { pathname } = useLocation();
+
+
 
     const [collapsed, setCollapsed] = useState(false);
     const {
@@ -78,7 +76,7 @@ const Dashboard = () => {
                 <div>
                     <h1 style={{ padding: '12px', color: '#367181' }}>R</h1>
                 </div>
-                <Menu theme="light" defaultSelectedKeys={[pathname]} mode="inline" items={items} />
+                <Menu theme="light" mode="inline" defaultSelectedKeys={[pathname]} items={items} />
             </Sider>
             <Layout>
                 <Header style={{ padding: '0px 16px', background: colorBgContainer }} >
@@ -98,7 +96,6 @@ const Dashboard = () => {
                     </Flex>
                 </Header>
                 <Content style={{ margin: '20px' }}>
-
                     <Outlet />
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>
@@ -106,9 +103,7 @@ const Dashboard = () => {
                 </Footer>
             </Layout>
         </Layout>
-
-
     )
 }
 
-export default Dashboard
+export default Dashboard;
