@@ -1,6 +1,6 @@
 import { Breadcrumb, Button, Drawer, Form, Row, Space, Spin, Table, message, theme } from "antd";
 import { Link, Navigate } from "react-router-dom";
-import { RightOutlined } from '@ant-design/icons';
+import { RightOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createUser, getAllUsers, updateUser } from "../../http/api";
 import UserFilters from "./UserFilters";
@@ -11,6 +11,7 @@ import UserForm from "./form/UserForm";
 import { useForm } from "antd/es/form/Form";
 import { AxiosError } from "axios";
 import { debounce } from "lodash";
+import DeleteUserModal from "./DeleteUserModal";
 
 const columns = [
     {
@@ -58,6 +59,7 @@ const columns = [
 const UsersPage = () => {
     const [open, setOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [userDeleteModalOpen, setUserDeleteModalOpen] = useState(false);
     const [form] = useForm();
     const [filterForm] = useForm();
 
@@ -157,6 +159,7 @@ const UsersPage = () => {
 
     return (
         <div>
+            <DeleteUserModal open={userDeleteModalOpen} setOpen={setUserDeleteModalOpen} user={selectedUser!} />
             {contextHolder}
             <Row justify={'space-between'}>
                 <Breadcrumb
@@ -182,7 +185,7 @@ const UsersPage = () => {
                     key: 'action',
                     render: (_text: string, record: User) => {
                         return (
-                            <Space>
+                            <Space size={'small'}>
                                 <Button
                                     type="link"
                                     onClick={() => {
@@ -190,7 +193,19 @@ const UsersPage = () => {
                                         setOpen(true);
                                         form.setFieldsValue({ ...record, tenantId: record.tenant?.id });
                                     }}
-                                >Edit</Button>
+                                >
+                                    <EditOutlined />
+                                </Button>
+                                <Button
+                                    type="link"
+                                    style={{ color: "red" }}
+                                    onClick={() => {
+                                        setUserDeleteModalOpen(true);
+                                        setSelectedUser(record);
+                                    }}
+                                >
+                                    <DeleteOutlined />
+                                </Button>
                             </Space>
                         );
                     },

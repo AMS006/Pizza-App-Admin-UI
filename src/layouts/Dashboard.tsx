@@ -68,7 +68,7 @@ const Dashboard = () => {
 
 
     if (user === null)
-        return <Navigate to="/auth/login" replace />
+        return <Navigate to={`/auth/login?returnTo=${pathname}`} replace />
 
     return (
         <Layout style={{ minHeight: '100vh' }}>

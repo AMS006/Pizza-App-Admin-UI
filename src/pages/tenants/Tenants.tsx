@@ -1,13 +1,14 @@
 import { Breadcrumb, Button, Drawer, Form, Row, Space, Spin, Table, theme } from "antd"
 import { Link } from "react-router-dom"
-import { RightOutlined, PlusOutlined } from '@ant-design/icons';
+import { RightOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import TenantsFilters from "./TenantsFilters";
 import { useMemo, useState } from "react";
 import TenantForm from "./form/TenantForm";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createTenant, getAllTenants } from "../../http/api";
+import { createTenant, getAllTenants, updateTenant } from "../../http/api";
 import { useForm } from "antd/es/form/Form";
 import { debounce } from "lodash";
+import DeleteTenantModal from "./DeleteTenantModal";
 
 const columns = [
     {
@@ -30,6 +31,9 @@ const columns = [
 const TenantsPage = () => {
     const [form] = useForm();
     const queryClient = useQueryClient();
+    const [deleteTenantModalOpen, setDeleteTenantModalOpen] = useState(false);
+    const [deleteTenant, setDeleteTenant] = useState<Tenant | null>(null);
+    const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
     const [queryParams, setQueryParams] = useState({
         page: '1',
         limit: '6',
@@ -44,7 +48,7 @@ const TenantsPage = () => {
         placeholderData: keepPreviousData
     });
 
-    const { mutate, isPending } = useMutation({
+    const { mutate: createTenantMutate, isPending: isCreatingTenant } = useMutation({
         mutationKey: ['createTenant'],
         mutationFn: async (data: Tenant) => createTenant(data).then((res) => res.data),
         onSuccess: () => {
@@ -52,14 +56,32 @@ const TenantsPage = () => {
             setOpen(false);
             form.resetFields();
         }
-    })
+    });
+
+    const { mutate: updateTenantMutate, isPending: isUpdatingTenant } = useMutation({
+        mutationKey: ['updateTenant'],
+        mutationFn: async (data: Tenant) => updateTenant(data).then((res) => res.data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['tenants'] });
+            setOpen(false);
+            setSelectedTenant(null);
+            form.resetFields();
+        }
+    });
 
     const [open, setOpen] = useState(false);
     const { token: { colorBgLayout } } = theme.useToken();
 
     const handleSubmit = async () => {
+        const isEditing = !!selectedTenant;
+
+        if (isEditing) {
+            await form.validateFields();
+            updateTenantMutate({ ...form.getFieldsValue(), id: selectedTenant?.id });
+            return;
+        }
         await form.validateFields();
-        mutate(form.getFieldsValue());
+        createTenantMutate(form.getFieldsValue());
     }
 
     const debouncedQUpdate = useMemo(() => {
@@ -73,6 +95,7 @@ const TenantsPage = () => {
     }
     return (
         <div>
+            <DeleteTenantModal open={deleteTenantModalOpen} setOpen={setDeleteTenantModalOpen} tenant={deleteTenant!} />
             <Row justify={'space-between'}>
                 <Breadcrumb
                     separator={<RightOutlined />}
@@ -88,7 +111,35 @@ const TenantsPage = () => {
             </Form>
             <Table
                 dataSource={data?.data?.tenants || []}
-                columns={columns}
+                columns={[...columns,
+                {
+                    title: "Action",
+                    key: "action",
+                    render: (_: string, record: Tenant) => (
+                        <Space>
+                            <Button
+                                type="link"
+                                onClick={() => {
+                                    setSelectedTenant(record);
+                                    setOpen(true);
+                                    form.setFieldsValue(record);
+                                }}
+                            >
+                                <EditOutlined />
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setDeleteTenantModalOpen(true);
+                                    setDeleteTenant(record);
+                                }}
+                                type="link"
+                                style={{ color: "red" }}>
+                                <DeleteOutlined />
+                            </Button>
+                        </Space>
+                    )
+                }
+                ]}
                 rowKey="id"
                 pagination={{
                     current: parseInt(queryParams.page),
@@ -105,14 +156,14 @@ const TenantsPage = () => {
                 title="Create Restaurant"
                 placement="right"
                 closable={true}
-                onClose={() => { setOpen(false); form.resetFields() }}
+                onClose={() => { setOpen(false); form.resetFields(); setSelectedTenant(null) }}
                 open={open}
                 width={520}
                 styles={{ body: { background: colorBgLayout } }}
                 extra={
                     <Space>
                         <Button onClick={() => { setOpen(false); form.resetFields() }}>Cancel</Button>
-                        <Button type="primary" loading={isPending} onClick={handleSubmit}>Submit</Button>
+                        <Button type="primary" loading={isCreatingTenant || isUpdatingTenant} onClick={handleSubmit}>Submit</Button>
                     </Space>
                 }
             >

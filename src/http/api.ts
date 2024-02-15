@@ -29,6 +29,18 @@ export const updateUser = async (user: User) => {
     return api.patch(`/users/${user.id}`, user);
 }
 
+export const deleteUser = async (id: number) => {
+    return api.delete(`/users/${id}`);
+}
+
 export const createTenant = async (tenant: Tenant) => {
     return api.post('/tenants', tenant);
+}
+
+export const updateTenant = async (tenant: Tenant) => {
+    return api.patch(`/tenants/${tenant.id}`, tenant);
+}
+
+export const deleteTenant = async (id: number) => {
+    return api.delete(`/tenants/${id}`);
 }
