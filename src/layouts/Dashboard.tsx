@@ -7,7 +7,7 @@ import { BellOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { logoutUser } from '../http/api';
-import { FoodIcon, HomeIcon, UserIcon } from '../components/Icons';
+import { BagIcon, FoodIcon, HomeIcon, UserIcon } from '../components/Icons';
 import Icon from '@ant-design/icons';
 
 
@@ -29,12 +29,29 @@ const getItems = (role: string) => {
                 label: <NavLink to='/users'>Users</NavLink>,
             },
             {
+                key: '/products',
+                icon: <Icon component={BagIcon} />,
+                label: <NavLink to='/products'>Products</NavLink>,
+            },
+            {
                 key: '/restaurants',
                 icon: <Icon component={FoodIcon} />,
                 label: <NavLink to='/restaurants'>Restaurants</NavLink>,
-            }
+            },
+
         ]
     }
+    if (role === 'manager') {
+        return [
+            ...commonItems,
+            {
+                key: '/products',
+                icon: <Icon component={BagIcon} />,
+                label: <NavLink to='/products'>Products</NavLink>,
+            },
+        ]
+    }
+
     return commonItems;
 }
 

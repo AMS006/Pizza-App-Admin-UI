@@ -34,6 +34,7 @@ const TenantsPage = () => {
     const [deleteTenantModalOpen, setDeleteTenantModalOpen] = useState(false);
     const [deleteTenant, setDeleteTenant] = useState<Tenant | null>(null);
     const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
+    const [title, setTitle] = useState('Create Restaurant');
     const [queryParams, setQueryParams] = useState({
         page: '1',
         limit: '6',
@@ -106,7 +107,7 @@ const TenantsPage = () => {
             </Row>
             <Form onValuesChange={(value: FilterValues) => onFilterChange(value)}>
                 <TenantsFilters >
-                    <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>Create Restaurant</Button>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={() => { setOpen(true); setTitle('Create Restaurant') }}>Create Restaurant</Button>
                 </TenantsFilters>
             </Form>
             <Table
@@ -122,6 +123,7 @@ const TenantsPage = () => {
                                 onClick={() => {
                                     setSelectedTenant(record);
                                     setOpen(true);
+                                    setTitle('Update Restaurant');
                                     form.setFieldsValue(record);
                                 }}
                             >
@@ -153,7 +155,7 @@ const TenantsPage = () => {
             />
 
             <Drawer
-                title="Create Restaurant"
+                title={title}
                 placement="right"
                 closable={true}
                 onClose={() => { setOpen(false); form.resetFields(); setSelectedTenant(null) }}

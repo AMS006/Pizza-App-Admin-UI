@@ -32,3 +32,15 @@ interface FilterValues {
     search?: string;
     role?: string;
 }
+
+interface Product {
+    _id: string;
+    name: string;
+    description: string;
+    image: string;
+}
+
+interface Category {
+    _id: string;
+    name: string;
+}

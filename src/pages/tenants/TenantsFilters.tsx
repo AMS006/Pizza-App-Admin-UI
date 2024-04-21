@@ -5,10 +5,10 @@ type TenantsFiltersProps = {
 }
 const TenantsFilters = ({ children }: TenantsFiltersProps) => {
     return (
-        <Card>
-            <Row justify={'space-between'}>
+        <Card style={{ marginBottom: '18px' }}>
+            <Row justify={'space-between'} >
                 <Col span={8}>
-                    <Form.Item name='search'>
+                    <Form.Item name='search' style={{ marginBottom: 0 }}>
                         <Input.Search
                             allowClear={true}
                             placeholder="Search..."

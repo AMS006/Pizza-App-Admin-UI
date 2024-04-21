@@ -180,6 +180,7 @@ const UsersPage = () => {
             <Table
                 dataSource={data?.data?.users || []}
                 style={{ margin: '16px 0px' }}
+
                 columns={[...columns, {
                     title: 'Action',
                     key: 'action',
@@ -214,12 +215,13 @@ const UsersPage = () => {
                 pagination={
                     {
                         total: data?.data?.count || 0,
+                        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+                        showQuickJumper: true,
                         pageSize: queryParams.limit ? parseInt(queryParams.limit) : 6,
                         current: queryParams.page ? parseInt(queryParams.page) : 1,
                         showSizeChanger: true,
                         pageSizeOptions: ['6', '10', '20', '30', '40', '50'],
                         onChange: (page, pageSize) => {
-
                             setQueryParams({ ...queryParams, page: page.toString(), limit: pageSize.toString() })
                         }
                     }

@@ -59,7 +59,7 @@ const LoginPage = () => {
                         <Form.Item name={'username'} rules={[{ required: true, message: "Username is required" }, { type: "email", message: "Email is not valid" }]} >
                             <Input placeholder="Username" prefix={<UserOutlined />} />
                         </Form.Item>
-                        <Form.Item name={'password'} rules={[{ required: true, message: "Password is required" }, { min: 8, message: "Password length must be atleast 8 characters" }]}>
+                        <Form.Item name={'password'} rules={[{ required: true, message: "Password is required" }]}>
                             <Input.Password placeholder="Password" prefix={<LockOutlined />} />
                         </Form.Item>
                         <Flex justify="space-between" >
