@@ -55,10 +55,30 @@ export const getAllCategories = async () => {
     return api.get(`${CATLOG_SERVICE}/category`);
 }
 
+export const getCategory = async (id: string) => {
+    return api.get(`${CATLOG_SERVICE}/category/${id}`);
+}
+
 export const getAllProducts = async (query: string) => {
     return api.get(`${CATLOG_SERVICE}/product?${query}`);
 }
 
 export const deleteProduct = async (id: string) => {
     return api.delete(`${CATLOG_SERVICE}/product/${id}`);
+}
+
+export const createProduct = async (product: FormData) => {
+    return api.post(`${CATLOG_SERVICE}/product`, product, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+}
+
+export const updateProduct = async (product: FormData, id: string) => {
+    return api.put(`${CATLOG_SERVICE}/product/${id}`, product, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
 }

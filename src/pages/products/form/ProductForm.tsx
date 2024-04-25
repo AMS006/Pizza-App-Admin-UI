@@ -1,29 +1,37 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, Col, Form, Input, Row, Select, Space } from "antd"
+import { Card, Col, Form, Input, Row, Select, Space, Switch, Upload } from "antd"
 import { getAllCategories, getAllTenants } from "../../../http/api";
+import Pricing from "./Pricing";
+import Attributes from "./Attributes";
 import { useEffect, useState } from "react";
 
 
-const ProductForm = ({ isEditing = false, role }: { isEditing: boolean, role?: string }) => {
-    const { data, isLoading } = useQuery({
+const ProductForm = () => {
+    const selectedCategory = Form.useWatch("categoryId");
+    const image = Form.useWatch("image");
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+    const { data: tenants, isLoading: tenantsLoading } = useQuery({
         queryKey: ['tenants'],
         queryFn: () => {
             return getAllTenants('');
         },
     });
-    const [selectedRole, setSelectedRole] = useState<string>('');
-    useEffect(() => {
 
-        if (role) {
-            setSelectedRole(role);
+    useEffect(() => {
+        if (image) {
+            setImageUrl(image)
         }
-    }, [role])
-    const { data: categories } = useQuery(
+    }, [image])
+
+
+    const { data: categories, isLoading: categoriesLoading } = useQuery(
         {
             queryKey: ['categories'],
             queryFn: () => getAllCategories()
         }
     )
+
 
     return (
         <Row>
@@ -43,14 +51,14 @@ const ProductForm = ({ isEditing = false, role }: { isEditing: boolean, role?: s
                             <Col span={12}>
                                 <Form.Item
                                     label="Category"
-                                    name="category"
+                                    name="categoryId"
                                     rules={[{ required: true, message: 'Category is required' }]}
                                 >
-                                    <Select placeholder='Select Category' loading={isLoading}>
+                                    <Select placeholder='Select Category' loading={categoriesLoading}>
                                         {categories && categories?.data.map((category: Category) => (
                                             <Select.Option
                                                 key={category._id}
-                                                value={category._id}
+                                                value={category._id.toString()}
                                             >
                                                 {category.name}
                                             </Select.Option>
@@ -62,6 +70,7 @@ const ProductForm = ({ isEditing = false, role }: { isEditing: boolean, role?: s
                                 <Form.Item
                                     label="Description"
                                     name="description"
+
                                     rules={[{ required: true, message: 'Description is required' }]}
                                 >
                                     <Input.TextArea
@@ -73,30 +82,48 @@ const ProductForm = ({ isEditing = false, role }: { isEditing: boolean, role?: s
                             </Col>
                         </Row>
                     </Card>
-
-                    <Card title='Role'>
+                    <Card title='Product Image'>
                         <Row gutter={12}>
                             <Col span={12}>
                                 <Form.Item
-                                    label="Role"
-                                    name="role"
-                                    rules={[{ required: true, message: 'Role is required' }]}
+                                    name="image"
+                                    rules={[{ required: true, message: 'Product Image is required' }]}
                                 >
-                                    <Select placeholder='Select Role' onChange={(value) => setSelectedRole(value)}>
-                                        <Select.Option value="admin">Admin</Select.Option>
-                                        <Select.Option value="manager">Manager</Select.Option>
-                                        <Select.Option value="customer">Customer</Select.Option>
-                                    </Select>
+
+                                    <Upload
+                                        name="image"
+                                        listType="picture-card"
+                                        accept="image/*"
+                                        multiple={false}
+                                        showUploadList={false}
+                                        fileList={[]}
+                                        beforeUpload={(file) => {
+                                            const reader = new FileReader();
+                                            reader.readAsDataURL(file);
+                                            reader.onload = () => {
+                                                setImageUrl(reader.result as string);
+                                            }
+                                            return false
+                                        }}
+                                    >
+                                        {image && imageUrl ? <img src={imageUrl} alt="Product" style={{ width: '100%' }} /> : 'Upload'}
+                                    </Upload>
+
                                 </Form.Item>
                             </Col>
-                            {selectedRole === 'manager' && <Col span={12}>
+
+                        </Row>
+                    </Card>
+                    <Card title='Tenant Info'>
+                        <Row gutter={12}>
+                            <Col span={12}>
                                 <Form.Item
-                                    label="Tenant"
+                                    label="Select Tenant"
                                     name="tenantId"
-                                    rules={[{ required: true, message: 'Role is required' }]}
+                                    rules={[{ required: true, message: 'Tenant is required' }]}
                                 >
-                                    <Select placeholder='Select Tenant' loading={isLoading}>
-                                        {data?.data?.tenants.map((tenant: Tenant) => (
+                                    <Select placeholder='Select Tenant' loading={tenantsLoading}>
+                                        {tenants && tenants?.data?.tenants?.map((tenant: Tenant) => (
                                             <Select.Option
                                                 key={tenant.id}
                                                 value={tenant.id}
@@ -106,22 +133,30 @@ const ProductForm = ({ isEditing = false, role }: { isEditing: boolean, role?: s
                                         ))}
                                     </Select>
                                 </Form.Item>
-                            </Col>}
+                            </Col>
                         </Row>
                     </Card>
-                    {!isEditing && <Card title='Security Info'>
+
+                    {selectedCategory && <Pricing selectedCategory={selectedCategory} />}
+
+                    {selectedCategory && <Attributes selectedCategory={selectedCategory} />}
+
+                    <Card title='Other Properties'>
                         <Row gutter={12}>
                             <Col span={12}>
                                 <Form.Item
-                                    label="Password"
-                                    name="password"
-                                    rules={[{ required: true, message: 'Password is required' }, { min: 8, message: 'Password length must be atleast 8 characters' }]}
+                                    label="Published"
+                                    name="isPublished"
+                                    valuePropName="checked"
                                 >
-                                    <Input.Password />
+                                    <Switch
+                                        defaultChecked={false}
+                                        checkedChildren="Yes"
+                                        unCheckedChildren="No" />
                                 </Form.Item>
                             </Col>
                         </Row>
-                    </Card>}
+                    </Card>
                 </Space>
             </Col>
         </Row>

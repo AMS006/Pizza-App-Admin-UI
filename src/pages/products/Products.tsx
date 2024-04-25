@@ -3,12 +3,13 @@ import { Link } from "react-router-dom"
 import { RightOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useMemo, useState } from "react";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createTenant, getAllProducts, updateTenant } from "../../http/api";
+import { createProduct, getAllProducts, updateProduct, } from "../../http/api";
 import { useForm } from "antd/es/form/Form";
 import ProductFilter from "./ProductFilter";
 import { debounce } from "lodash";
 import DeleteProductModal from "./DeleteProductModal";
 import ProductForm from "./form/ProductForm";
+import { convertToFormData } from "./helper";
 
 
 const columns = [
@@ -37,7 +38,7 @@ const columns = [
     },
     {
         title: 'Status',
-        dataIndex: 'status',
+        dataIndex: 'isPublished',
         key: 'isPublished',
         render: (text: boolean) => {
             return <Tag color={text ? 'green' : 'red'}>{text ? 'Published' : 'Draft'}</Tag>
@@ -54,11 +55,12 @@ const columns = [
 
 const ProductsPage = () => {
     const [form] = useForm();
-    const queryClient = useQueryClient();
+    // const queryClient = useQueryClient();
 
     const [title, setTitle] = useState('Add Product');
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [deleteModalOpen, setDeleteTenantModalOpen] = useState(false);
+    const queryClient = useQueryClient();
     const [queryParams, setQueryParams] = useState({
         page: '1',
         limit: '6',
@@ -73,40 +75,66 @@ const ProductsPage = () => {
         placeholderData: keepPreviousData
     });
 
-    const { mutate: createTenantMutate, isPending: isCreatingTenant } = useMutation({
-        mutationKey: ['createTenant'],
-        mutationFn: async (data: Tenant) => createTenant(data).then((res) => res.data),
+    const { mutate: productMutate, isPending: isCreatingProduct } = useMutation({
+        mutationKey: ['createProduct'],
+        mutationFn: async (data: FormData) => {
+            console.log(selectedProduct)
+            if (selectedProduct) {
+                return updateProduct(data, selectedProduct._id).then((res) => res.data);
+            }
+            return createProduct(data).then((res) => res.data);
+        },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['tenants'] });
-            setOpen(false);
-            form.resetFields();
-        }
-    });
-
-    const { mutate: updateTenantMutate, isPending: isUpdatingTenant } = useMutation({
-        mutationKey: ['updateTenant'],
-        mutationFn: async (data: Tenant) => updateTenant(data).then((res) => res.data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['tenants'] });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
             setOpen(false);
             setSelectedProduct(null);
             form.resetFields();
         }
     });
 
+
+
+
     const [open, setOpen] = useState(false);
     const { token: { colorBgLayout } } = theme.useToken();
 
     const handleSubmit = async () => {
-        const isEditing = !!selectedProduct;
-
-        if (isEditing) {
-            await form.validateFields();
-            updateTenantMutate({ ...form.getFieldsValue(), id: selectedProduct?._id });
-            return;
-        }
         await form.validateFields();
-        createTenantMutate(form.getFieldsValue());
+        const attributes = Object.entries(form.getFieldValue('attributes')).map(([key, value]) => {
+            return {
+                name: key,
+                value: value
+            }
+        })
+
+        const pricing = Object.entries(form.getFieldValue('priceConfiguration')).reduce((acc, [key, value]) => {
+            const { key: k, priceType } = JSON.parse(key);
+            return {
+                ...acc,
+                [k]: {
+                    priceType: priceType,
+                    availableOptions: value
+                }
+            }
+        }, {})
+
+
+        const data = {
+            ...form.getFieldsValue(),
+            attributes,
+            priceConfiguration: pricing,
+            isPublished: form.getFieldValue('isPublished') ? true : false,
+            categoryId: form.getFieldValue('categoryId')
+        }
+
+
+
+        const formData = convertToFormData(data);
+
+
+        productMutate(formData);
+
+
     }
 
     const debouncedQUpdate = useMemo(() => {
@@ -116,12 +144,39 @@ const ProductsPage = () => {
     }, []);
 
     const onFilterChange = (changedValues: FilterValues) => {
-
         if ('search' in changedValues) {
             debouncedQUpdate(changedValues.search || '');
         } else {
             setQueryParams((prev) => ({ ...prev, ...changedValues, page: '1' }));
         }
+    }
+
+    const handleEditProduct = (product: Product) => {
+
+        const attributes = product.attributes.reduce((acc, curr) => {
+            return {
+                ...acc,
+                [curr.name]: curr.value
+            }
+        }, {})
+
+
+        const priceConfiguration = Object.entries(product.priceConfiguration).reduce((acc, [key, value]) => {
+            return {
+                ...acc,
+                [JSON.stringify({ key, priceType: value.priceType })]: value.availableOptions
+            }
+        }, {})
+        console.log(priceConfiguration)
+
+        form.setFieldsValue({
+            ...product,
+            tenantId: Number(product.tenantId),
+            image: product.image,
+            attributes,
+            priceConfiguration
+        })
+
     }
 
 
@@ -144,12 +199,10 @@ const ProductsPage = () => {
 
             <Table
                 dataSource={products?.data?.data || []}
-
                 columns={[...columns,
                 {
                     title: "Action",
                     key: "action",
-
                     render: (_: string, row: Product) => {
                         return <Space>
                             <Button
@@ -158,7 +211,7 @@ const ProductsPage = () => {
                                     setSelectedProduct(row);
                                     setOpen(true);
                                     setTitle('Update Product');
-                                    form.setFieldsValue(row);
+                                    handleEditProduct(row)
                                 }}
                             >
                                 <EditOutlined />
@@ -176,7 +229,7 @@ const ProductsPage = () => {
                     }
                 }
                 ]}
-                rowKey="id"
+                rowKey="_id"
                 pagination={{
                     current: parseInt(queryParams.page),
                     pageSize: parseInt(queryParams.limit),
@@ -192,19 +245,23 @@ const ProductsPage = () => {
                 title={title}
                 placement="right"
                 closable={true}
-                onClose={() => { setOpen(false); form.resetFields(); setSelectedProduct(null) }}
+                onClose={() => {
+                    setSelectedProduct(null);
+                    setOpen(false);
+                    form.resetFields();
+                }}
                 open={open}
                 width={620}
                 styles={{ body: { background: colorBgLayout } }}
                 extra={
                     <Space>
-                        <Button onClick={() => { setOpen(false); form.resetFields() }}>Cancel</Button>
-                        <Button type="primary" loading={isCreatingTenant || isUpdatingTenant} onClick={handleSubmit}>Submit</Button>
+                        <Button onClick={() => { setOpen(false); form.resetFields(); setSelectedProduct(null) }}>Cancel</Button>
+                        <Button type="primary" onClick={handleSubmit} loading={isCreatingProduct}>Submit</Button>
                     </Space>
                 }
             >
                 <Form layout="vertical" form={form}>
-                    <ProductForm isEditing={false} />
+                    <ProductForm />
                 </Form>
             </Drawer>
         </div>

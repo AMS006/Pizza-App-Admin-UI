@@ -32,15 +32,40 @@ interface FilterValues {
     search?: string;
     role?: string;
 }
+interface ProductAttribute {
+    name: string;
+    value: string | boolean;
+}
 
 interface Product {
     _id: string;
     name: string;
     description: string;
     image: string;
+    categoryId: string;
+    tenantId: string;
+    priceConfiguration: PriceConfigration;
+    attributes: ProductAttribute[];
 }
 
 interface Category {
     _id: string;
     name: string;
+    priceConfigration: PriceConfigration;
+    attributes: Attribute[];
 }
+
+interface PriceConfigration {
+    [key: string]: {
+        priceType: "base" | "aditional";
+        availableOptions: string[];
+    };
+}
+
+interface Attribute {
+    name: string;
+    widgetType: "radio" | "switch";
+    defaultValue: string;
+    availableOptions: string[];
+}
+
