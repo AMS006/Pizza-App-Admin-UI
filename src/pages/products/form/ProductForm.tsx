@@ -4,12 +4,14 @@ import { getAllCategories, getAllTenants } from "../../../http/api";
 import Pricing from "./Pricing";
 import Attributes from "./Attributes";
 import { useEffect, useState } from "react";
+import { useAuth } from "../../../store";
 
 
 const ProductForm = () => {
     const selectedCategory = Form.useWatch("categoryId");
     const image = Form.useWatch("image");
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const { user } = useAuth();
 
     const { data: tenants, isLoading: tenantsLoading } = useQuery({
         queryKey: ['tenants'],
@@ -114,28 +116,31 @@ const ProductForm = () => {
 
                         </Row>
                     </Card>
-                    <Card title='Tenant Info'>
-                        <Row gutter={12}>
-                            <Col span={12}>
-                                <Form.Item
-                                    label="Select Tenant"
-                                    name="tenantId"
-                                    rules={[{ required: true, message: 'Tenant is required' }]}
-                                >
-                                    <Select placeholder='Select Tenant' loading={tenantsLoading}>
-                                        {tenants && tenants?.data?.tenants?.map((tenant: Tenant) => (
-                                            <Select.Option
-                                                key={tenant.id}
-                                                value={tenant.id}
-                                            >
-                                                {tenant.name}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                    </Card>
+                    {
+                        user?.role === 'admin' &&
+                        <Card title='Tenant Info'>
+                            <Row gutter={12}>
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Select Tenant"
+                                        name="tenantId"
+                                        rules={[{ required: true, message: 'Tenant is required' }]}
+                                    >
+                                        <Select placeholder='Select Tenant' loading={tenantsLoading}>
+                                            {tenants && tenants?.data?.tenants?.map((tenant: Tenant) => (
+                                                <Select.Option
+                                                    key={tenant.id}
+                                                    value={tenant.id}
+                                                >
+                                                    {tenant.name}
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                        </Card>
+                    }
 
                     {selectedCategory && <Pricing selectedCategory={selectedCategory} />}
 

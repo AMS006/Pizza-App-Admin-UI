@@ -23,7 +23,7 @@ const Pricing = ({ selectedCategory }: PricingProps) => {
             title="Pricing"
         >
             {
-                Object.entries(category.priceConfigration).map(([key, value], index) => {
+                Object.entries(category.priceConfiguration).map(([key, value], index) => {
                     return (
                         <Space direction="vertical" key={index}>
                             <Typography.Text style={{ fontWeight: "bold" }} >{key} ({value.priceType})</Typography.Text>

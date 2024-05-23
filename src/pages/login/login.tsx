@@ -15,7 +15,6 @@ const LoginPage = () => {
         queryKey: ['self'],
         queryFn: self,
         enabled: false,
-
     });
 
     const { mutate: logoutMutate } = useMutation({
@@ -48,7 +47,7 @@ const LoginPage = () => {
                     bordered={false}
                     title={<Space style={{ width: '100%', fontSize: 18, justifyContent: 'center' }}><LockFilled /> Sign In</Space>}
                 >
-                    {isError && error instanceof AxiosError && <Alert message={error.response?.data?.errors[0].message} type="error" showIcon style={{ marginBottom: '12px' }} />}
+                    {isError && error instanceof AxiosError && <Alert message={error.response?.data?.errors[0].message || "Invalid email or password"} type="error" showIcon style={{ marginBottom: '12px' }} />}
                     <Form
                         onFinish={(values) => {
                             mutate({ email: values.username, password: values.password })

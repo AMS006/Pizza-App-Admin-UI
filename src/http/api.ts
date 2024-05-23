@@ -82,3 +82,27 @@ export const updateProduct = async (product: FormData, id: string) => {
         }
     });
 }
+
+export const createTopping = async (topping: FormData) => {
+    return api.post(`${CATLOG_SERVICE}/topping`, topping, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+}
+
+export const updateTopping = async (topping: FormData, id: string) => {
+    return api.put(`${CATLOG_SERVICE}/topping/${id}`, topping, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+}
+
+export const deleteTopping = async (id: string) => {
+    return api.delete(`${CATLOG_SERVICE}/topping/${id}`);
+}
+
+export const getAllToppings = async (query: string) => {
+    return api.get(`${CATLOG_SERVICE}/topping?${query}`);
+}

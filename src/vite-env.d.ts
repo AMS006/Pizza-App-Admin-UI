@@ -31,6 +31,7 @@ interface ErrorResponse {
 interface FilterValues {
     search?: string;
     role?: string;
+    tenantId?: string;
 }
 interface ProductAttribute {
     name: string;
@@ -51,7 +52,7 @@ interface Product {
 interface Category {
     _id: string;
     name: string;
-    priceConfigration: PriceConfigration;
+    priceConfiguration: PriceConfigration;
     attributes: Attribute[];
 }
 
@@ -67,5 +68,13 @@ interface Attribute {
     widgetType: "radio" | "switch";
     defaultValue: string;
     availableOptions: string[];
+}
+
+interface Topping {
+    _id: string;
+    name: string;
+    price: number;
+    image: string;
+    tenantId: string;
 }
 

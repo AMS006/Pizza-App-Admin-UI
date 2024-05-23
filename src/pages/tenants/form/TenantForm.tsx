@@ -1,6 +1,8 @@
-import { Card, Col, Form, Input, Row } from "antd"
+import { Card, Col, Form, Input, Row, } from "antd"
 
 const TenantForm = () => {
+
+
     return (
         <Row>
             <Col span={24}>
@@ -12,7 +14,11 @@ const TenantForm = () => {
                         <Input />
                     </Form.Item>
                 </Card>
+
+
             </Col>
+
+
         </Row>
     )
 }

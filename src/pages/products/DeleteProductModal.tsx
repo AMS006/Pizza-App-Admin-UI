@@ -7,9 +7,10 @@ interface DeleteProductModalProps {
     open: boolean;
     setOpen: (open: boolean) => void;
     product: Product;
+    setSelectedProduct: (product: Product | null) => void;
 }
 
-const DeleteProductModal = ({ open, setOpen, product }: DeleteProductModalProps) => {
+const DeleteProductModal = ({ open, setOpen, product, setSelectedProduct }: DeleteProductModalProps) => {
 
     const queryClient = useQueryClient();
     const [modalText, setModalText] = useState('Are you sure you want to delete this product? This action cannot be undone.');
@@ -20,9 +21,11 @@ const DeleteProductModal = ({ open, setOpen, product }: DeleteProductModalProps)
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['products'] });
             setOpen(false);
+            setSelectedProduct(null);
         },
         onError: () => {
-            message.error("Unable to delete product")
+            message.error("Unable to delete product");
+
         }
     })
 

@@ -10,6 +10,7 @@ import { debounce } from "lodash";
 import DeleteProductModal from "./DeleteProductModal";
 import ProductForm from "./form/ProductForm";
 import { convertToFormData } from "./helper";
+import { useAuth } from "../../store";
 
 
 const columns = [
@@ -56,15 +57,18 @@ const columns = [
 const ProductsPage = () => {
     const [form] = useForm();
     // const queryClient = useQueryClient();
+    const { user } = useAuth();
 
     const [title, setTitle] = useState('Add Product');
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [deleteModalOpen, setDeleteTenantModalOpen] = useState(false);
     const queryClient = useQueryClient();
+
     const [queryParams, setQueryParams] = useState({
         page: '1',
         limit: '6',
         search: '',
+        tenantId: user?.role === 'manager' ? String(user.tenant.id) : ''
     })
     const { data: products, isFetching } = useQuery({
         queryKey: ['products', queryParams],
@@ -131,6 +135,10 @@ const ProductsPage = () => {
 
         const formData = convertToFormData(data);
 
+        if (user?.role === 'manager') {
+            formData.append('tenantId', String(user.tenant.id))
+        }
+
 
         productMutate(formData);
 
@@ -182,7 +190,7 @@ const ProductsPage = () => {
 
     return (
         <div>
-            <DeleteProductModal open={deleteModalOpen} setOpen={setDeleteTenantModalOpen} product={selectedProduct!} />
+            <DeleteProductModal open={deleteModalOpen} setOpen={setDeleteTenantModalOpen} product={selectedProduct!} setSelectedProduct={setSelectedProduct} />
             <Row justify={'space-between'}>
                 <Breadcrumb
                     separator={<RightOutlined />}

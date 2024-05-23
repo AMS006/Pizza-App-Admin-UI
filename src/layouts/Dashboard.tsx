@@ -7,8 +7,9 @@ import { BellOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { logoutUser } from '../http/api';
-import { BagIcon, FoodIcon, HomeIcon, UserIcon } from '../components/Icons';
+import { BagIcon, FoodIcon, HomeIcon, Topping, UserIcon } from '../components/Icons';
 import Icon from '@ant-design/icons';
+import logo from '../assets/logo.jpg'
 
 
 const getItems = (role: string) => {
@@ -38,6 +39,11 @@ const getItems = (role: string) => {
                 icon: <Icon component={FoodIcon} />,
                 label: <NavLink to='/restaurants'>Restaurants</NavLink>,
             },
+            {
+                key: '/Topping',
+                icon: <Icon component={Topping} />,
+                label: <NavLink to='/toppings'>Toppings</NavLink>,
+            }
 
         ]
     }
@@ -49,6 +55,12 @@ const getItems = (role: string) => {
                 icon: <Icon component={BagIcon} />,
                 label: <NavLink to='/products'>Products</NavLink>,
             },
+            {
+                key: '/Topping',
+                icon: <Icon component={Topping} />,
+                label: <NavLink to='/toppings'>Toppings</NavLink>,
+            }
+
         ]
     }
 
@@ -90,9 +102,9 @@ const Dashboard = () => {
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider theme='light' collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-                <div>
-                    <h1 style={{ padding: '12px', color: '#367181' }}>R</h1>
-                </div>
+                <Flex align='center' justify='center'>
+                    <img src={logo} style={{ width: '70px' }}></img>
+                </Flex>
                 <Menu theme="light" mode="inline" defaultSelectedKeys={[pathname]} items={items} />
             </Sider>
             <Layout>

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Modal } from 'antd';
+import { Modal, message } from 'antd';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteUser } from '../../http/api';
+import { AxiosError } from 'axios';
 
 interface DeleteUserProps {
     open: boolean;
@@ -23,6 +24,13 @@ const DeleteUserModal = ({ open, setOpen, user }: DeleteUserProps) => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['allUsers'] });
             setOpen(false);
+        },
+        onError: (error: AxiosError) => {
+            if (error instanceof AxiosError) {
+                console.log(error.response?.data);
+                setOpen(false);
+                message.error("Unable to delete User")
+            }
         }
 
     })

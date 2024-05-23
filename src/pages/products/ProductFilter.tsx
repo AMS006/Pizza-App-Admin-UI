@@ -28,7 +28,7 @@ const ProductFilter = ({ children }: ProductFilterProps) => {
                             />
                         </Form.Item>
 
-                        <Form.Item name='category' style={{ marginBottom: 0 }}>
+                        <Form.Item name='categoryId' style={{ marginBottom: 0 }}>
                             <Select placeholder={'Select Category'} allowClear>
                                 {categories && categories.data?.map((category: Category) => (
                                     <Select.Option key={category._id} value={category._id}>{category.name}</Select.Option>
@@ -37,10 +37,7 @@ const ProductFilter = ({ children }: ProductFilterProps) => {
                         </Form.Item>
                         <Space>
                             <Form.Item name='isPublished' style={{ marginBottom: 0 }}>
-
                                 <Switch defaultChecked={false} onChange={() => { }} checkedChildren="Yes" unCheckedChildren="No" />
-
-
                             </Form.Item>
                             <Typography.Text >Show only Published</Typography.Text>
                         </Space>

@@ -37,7 +37,6 @@ const UserFilters = ({ children }: UserFiltersProps) => {
                                 placeholder='Select Role'
                             />
                         </Form.Item>
-
                     </Flex>
                 </Col>
                 <Col>
