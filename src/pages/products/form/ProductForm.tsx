@@ -30,7 +30,7 @@ const ProductForm = () => {
     const { data: categories, isLoading: categoriesLoading } = useQuery(
         {
             queryKey: ['categories'],
-            queryFn: () => getAllCategories()
+            queryFn: () => getAllCategories('')
         }
     )
 
@@ -57,7 +57,7 @@ const ProductForm = () => {
                                     rules={[{ required: true, message: 'Category is required' }]}
                                 >
                                     <Select placeholder='Select Category' loading={categoriesLoading}>
-                                        {categories && categories?.data.map((category: Category) => (
+                                        {categories && categories?.data?.data.map((category: Category) => (
                                             <Select.Option
                                                 key={category._id}
                                                 value={category._id.toString()}

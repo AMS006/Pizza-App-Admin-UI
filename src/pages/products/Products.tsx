@@ -207,6 +207,8 @@ const ProductsPage = () => {
 
             <Table
                 dataSource={products?.data?.data || []}
+                bordered
+                scroll={{ x: 900 }}
                 columns={[...columns,
                 {
                     title: "Action",

@@ -12,7 +12,7 @@ const ProductFilter = ({ children }: ProductFilterProps) => {
     const { data: categories } = useQuery(
         {
             queryKey: ['categories'],
-            queryFn: () => getAllCategories()
+            queryFn: () => getAllCategories('')
         }
     )
 
@@ -30,7 +30,7 @@ const ProductFilter = ({ children }: ProductFilterProps) => {
 
                         <Form.Item name='categoryId' style={{ marginBottom: 0 }}>
                             <Select placeholder={'Select Category'} allowClear>
-                                {categories && categories.data?.map((category: Category) => (
+                                {categories && categories.data?.data?.map((category: Category) => (
                                     <Select.Option key={category._id} value={category._id}>{category.name}</Select.Option>
                                 ))}
                             </Select>

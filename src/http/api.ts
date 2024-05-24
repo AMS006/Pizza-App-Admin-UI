@@ -51,12 +51,25 @@ export const deleteTenant = async (id: number) => {
 
 // Catlog - service
 
-export const getAllCategories = async () => {
-    return api.get(`${CATLOG_SERVICE}/category`);
+export const createCategory = async (category: CreateCategory) => {
+    return api.post(`${CATLOG_SERVICE}/category`, category);
+
+}
+
+export const updateCategory = async (category: CreateCategory, _id: string) => {
+    return api.put(`${CATLOG_SERVICE}/category/${_id}`, category);
+}
+
+export const getAllCategories = async (query: string) => {
+    return api.get(`${CATLOG_SERVICE}/category?${query}`);
 }
 
 export const getCategory = async (id: string) => {
     return api.get(`${CATLOG_SERVICE}/category/${id}`);
+}
+
+export const deleteCategory = async (id: string) => {
+    return api.delete(`${CATLOG_SERVICE}/category/${id}`);
 }
 
 export const getAllProducts = async (query: string) => {

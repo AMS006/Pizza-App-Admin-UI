@@ -8,6 +8,7 @@ import UsersPage from "./pages/users/users";
 import TenantsPage from "./pages/tenants/Tenants";
 import ProductsPage from "./pages/products/Products";
 import ToppingsPage from "./pages/toppings/Toppings";
+import CategoryPage from "./pages/category/Category";
 
 export const router = createBrowserRouter([
     {
@@ -29,7 +30,8 @@ export const router = createBrowserRouter([
                     { path: 'users', element: <UsersPage /> },
                     { path: 'restaurants', element: <TenantsPage /> },
                     { path: 'products', element: <ProductsPage /> },
-                    { path: 'toppings', element: <ToppingsPage /> }
+                    { path: 'toppings', element: <ToppingsPage /> },
+                    { path: 'category', element: <CategoryPage /> }
                 ]
             }
         ]

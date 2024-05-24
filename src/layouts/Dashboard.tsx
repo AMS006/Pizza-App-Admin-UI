@@ -7,7 +7,7 @@ import { BellOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { logoutUser } from '../http/api';
-import { BagIcon, FoodIcon, HomeIcon, Topping, UserIcon } from '../components/Icons';
+import { BagIcon, CategoryIcon, FoodIcon, HomeIcon, Topping, UserIcon } from '../components/Icons';
 import Icon from '@ant-design/icons';
 import logo from '../assets/logo.jpg'
 
@@ -40,9 +40,14 @@ const getItems = (role: string) => {
                 label: <NavLink to='/restaurants'>Restaurants</NavLink>,
             },
             {
-                key: '/Topping',
+                key: '/topping',
                 icon: <Icon component={Topping} />,
                 label: <NavLink to='/toppings'>Toppings</NavLink>,
+            },
+            {
+                key: '/category',
+                icon: <Icon component={CategoryIcon} />,
+                label: <NavLink to='/category'>Category</NavLink>,
             }
 
         ]

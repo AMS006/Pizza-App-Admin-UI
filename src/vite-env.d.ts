@@ -56,6 +56,12 @@ interface Category {
     attributes: Attribute[];
 }
 
+interface CreateCategory {
+    name: string;
+    priceConfiguration: PriceConfigration;
+    attributes: Attribute[];
+}
+
 interface PriceConfigration {
     [key: string]: {
         priceType: "base" | "aditional";
