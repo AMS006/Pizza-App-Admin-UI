@@ -4,6 +4,7 @@ import { self } from "../http/api";
 import { useEffect } from "react";
 import { useAuth } from "../store";
 import { AxiosError } from "axios";
+import Loader from "./Loader";
 
 const Root = () => {
     const { setUser, logout } = useAuth();
@@ -27,8 +28,7 @@ const Root = () => {
     }, [data, setUser]);
 
     if (isLoading)
-        return <div>Loading...</div>
-
+        return <Loader />
     return (
         <Outlet />
     )
