@@ -32,6 +32,7 @@ interface FilterValues {
     search?: string;
     role?: string;
     tenantId?: string;
+    orderStatus?: string;
 }
 interface ProductAttribute {
     name: string;
@@ -82,5 +83,46 @@ interface Topping {
     price: number;
     image: string;
     tenantId: string;
+}
+
+interface Coupon {
+    _id: string;
+    couponCode: string;
+    discount: number;
+}
+
+interface AddressType {
+    _id: string;
+    name: string;
+    mobile: string;
+    addressLine1: string;
+    addressLine2?: string;
+    pincode: string;
+    city: string;
+    state: string;
+    userId?: string;
+}
+
+interface OrderItemType {
+    _id: string;
+    qty: number;
+    totalPrice: number;
+    hash: string;
+    image: string;
+    name: string;
+    chosenConfiguration: {
+        priceConfiguration: {
+            [key: string]: string;
+        };
+        selectedToppings: Topping[];
+    };
+    priceConfiguration: {
+        [key: string]: {
+            priceType: 'base' | 'aditional';
+            availableOptions: {
+                [key: string]: number;
+            };
+        };
+    };
 }
 

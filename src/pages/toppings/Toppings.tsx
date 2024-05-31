@@ -45,7 +45,7 @@ const ToppingsPage = () => {
     })
 
     useEffect(() => {
-        if (user?.role === 'admin') {
+        if (user?.role === 'admin' && columns.length === 2) {
             columns.push(
                 {
                     title: "Restaurant",

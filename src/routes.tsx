@@ -9,6 +9,9 @@ import TenantsPage from "./pages/tenants/Tenants";
 import ProductsPage from "./pages/products/Products";
 import ToppingsPage from "./pages/toppings/Toppings";
 import CategoryPage from "./pages/category/Category";
+import CouponsPage from "./pages/coupons/Coupons";
+import OrdersPage from "./pages/orders/Orders";
+import OrderDetailsPage from "./pages/orderDetails/OrderDetails";
 
 export const router = createBrowserRouter([
     {
@@ -31,7 +34,10 @@ export const router = createBrowserRouter([
                     { path: 'restaurants', element: <TenantsPage /> },
                     { path: 'products', element: <ProductsPage /> },
                     { path: 'toppings', element: <ToppingsPage /> },
-                    { path: 'category', element: <CategoryPage /> }
+                    { path: 'category', element: <CategoryPage /> },
+                    { path: 'coupon', element: <CouponsPage /> },
+                    { path: 'orders', element: <OrdersPage /> },
+                    { path: 'orders/:id', element: <OrderDetailsPage /> }
                 ]
             }
         ]

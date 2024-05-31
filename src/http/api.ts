@@ -2,6 +2,7 @@ import { api } from "./client"
 
 export const AUTH_SERVICE = '/api/auth';
 const CATLOG_SERVICE = '/api/catlog';
+const ORDER_SERVICE = '/api/order';
 
 export const login = async (credentials: Credentials) => {
     return (await api.post(`${AUTH_SERVICE}/auth/login`, credentials)).data;
@@ -118,4 +119,38 @@ export const deleteTopping = async (id: string) => {
 
 export const getAllToppings = async (query: string) => {
     return api.get(`${CATLOG_SERVICE}/topping?${query}`);
+}
+
+// Order- Service
+
+export const getAllCoupons = async (query: string) => {
+    return api.get(`${ORDER_SERVICE}/coupon?${query}`);
+}
+
+export const createCoupon = async (coupon: Coupon) => {
+    return api.post(`${ORDER_SERVICE}/coupon`, coupon);
+}
+
+export const updateCoupon = async (coupon: Coupon) => {
+    return api.put(`${ORDER_SERVICE}/coupon/${coupon._id}`, coupon);
+}
+
+export const deleteCoupon = async (id: string) => {
+    return api.delete(`${ORDER_SERVICE}/coupon/${id}`);
+}
+
+export const getAllOrders = async (query: string) => {
+    return api.get(`${ORDER_SERVICE}/order?${query}`);
+}
+
+export const getOrder = async (id: string) => {
+    return api.get(`${ORDER_SERVICE}/order/details/${id}`);
+}
+
+export const confirmOrder = async (id: string) => {
+    return api.patch(`${ORDER_SERVICE}/order/confirm/${id}`);
+}
+
+export const updateOrderStatus = async (id: string, status: string) => {
+    return api.patch(`${ORDER_SERVICE}/order/status/${id}`, { status });
 }
