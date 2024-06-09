@@ -103,6 +103,15 @@ interface AddressType {
     userId?: string;
 }
 
+interface OrderType {
+    _id: string;
+    userId: string;
+    address: AddressType;
+    orderItems: OrderItemType[];
+    orderStatus: string;
+    orderAmount: number;
+}
+
 interface OrderItemType {
     _id: string;
     qty: number;
@@ -124,5 +133,19 @@ interface OrderItemType {
             };
         };
     };
+}
+
+interface RecentOrderType {
+    _id: string;
+    OrderSummary: string,
+    address: string,
+    amount: number,
+    status: string,
+    loading: boolean,
+}
+
+interface ReportType {
+    date: string;
+    totalSales: number;
 }
 

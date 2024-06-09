@@ -160,6 +160,18 @@ const ProductForm = () => {
                                         unCheckedChildren="No" />
                                 </Form.Item>
                             </Col>
+                            <Col span={12}>
+                                <Form.Item
+                                    label="Topping Available"
+                                    name="isToppingAvailable"
+                                    valuePropName="checked"
+                                >
+                                    <Switch
+                                        defaultChecked={true}
+                                        checkedChildren="Yes"
+                                        unCheckedChildren="No" />
+                                </Form.Item>
+                            </Col>
                         </Row>
                     </Card>
                 </Space>

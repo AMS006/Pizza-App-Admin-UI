@@ -1,5 +1,4 @@
 import { createBrowserRouter } from "react-router-dom";
-import Homepage from "./pages/Homepage";
 import LoginPage from "./pages/login/login";
 import Root from "./layouts/Root";
 import NonAuth from "./layouts/NonAuth";
@@ -12,6 +11,7 @@ import CategoryPage from "./pages/category/Category";
 import CouponsPage from "./pages/coupons/Coupons";
 import OrdersPage from "./pages/orders/Orders";
 import OrderDetailsPage from "./pages/orderDetails/OrderDetails";
+import Homepage from "./pages/home/Home";
 
 export const router = createBrowserRouter([
     {

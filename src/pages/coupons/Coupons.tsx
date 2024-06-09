@@ -26,6 +26,14 @@ const columns = [
         }
     },
     {
+        title: 'Min Order Amount',
+        dataIndex: 'minOrderAmount',
+        key: 'minOrderAmount',
+        render: (text: number) => {
+            return <Tag color="purple">₹{text}</Tag>
+        }
+    },
+    {
         title: 'Status',
         dataIndex: 'status',
         key: 'status',

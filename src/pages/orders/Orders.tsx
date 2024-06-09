@@ -40,21 +40,22 @@ const columns = [
         dataIndex: 'orderStatus',
         key: 'orderStatus',
         render: (text: string) => {
-            if (text === 'Delivered') {
-                return <Tag color="green">Delivered</Tag>
-            }
-            if (text === 'Cancelled') {
-                return <Tag color="red">Cancelled</Tag>
-            }
             if (text === 'Ordered') {
                 return <Tag color="blue">Ordered</Tag>
+            }
+            if (text === 'Prepared') {
+                return <Tag color="purple">Prepared</Tag>
+            }
+            if (text === 'Delivered') {
+                return <Tag color="green">Delivered</Tag>
             }
             if (text === 'Out for delivery') {
                 return <Tag color="orange">Out for delivery</Tag>
             }
-            if (text === 'Ordered') {
-                return <Tag color="blue">Ordered</Tag>
+            if (text === 'Cancelled') {
+                return <Tag color="red">Cancelled</Tag>
             }
+
         }
 
     },

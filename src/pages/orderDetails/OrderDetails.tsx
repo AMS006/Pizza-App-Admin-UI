@@ -1,12 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { confirmOrder, getOrder, updateOrderStatus } from "../../http/api";
 import Loader from "../../layouts/Loader";
 import { useParams } from "react-router-dom";
 import OrderHeader from "./OrderHeader";
-import { Button, Card, Col, Flex, Popconfirm, Row, notification } from "antd";
-import OrderItemCard from "./OrderItemCart";
-import { createContext, useMemo, useState } from "react";
-import ConfirmOrderModal from "./ConfirmOrderModal";
+import { Button, Card, Col, Flex, Popconfirm, Row, Tag, Typography, notification } from "antd";
+import OrderItemCard from "./OrderItemCard";
+import { createContext, useMemo } from "react";
 import type { NotificationArgsProps } from 'antd';
 
 type NotificationPlacement = NotificationArgsProps['placement'];
@@ -17,13 +16,14 @@ const Context = createContext({ name: 'Default' });
 const OrderDetailsPage = () => {
 
     const { id } = useParams();
-    const [confirmOrderModalOpen, setConfirmOrderModalOpen] = useState(false);
     const [api, contextHolder] = notification.useNotification();
 
 
-    const { data: orderData, isFetching } = useQuery({
+    const { data: orderData, isLoading } = useQuery({
         queryKey: ['order', id],
-        queryFn: () => getOrder(id || '')
+        queryFn: () => getOrder(id || ''),
+        placeholderData: keepPreviousData,
+
     });
 
     const queryClient = useQueryClient();
@@ -43,12 +43,10 @@ const OrderDetailsPage = () => {
         mutationFn: (status: string) => updateOrderStatus(id || '', status),
         onSuccess: async () => {
             openNotification('topRight', "Order Status Updated", `Order status updated to ${getOrderStatusButtonText}`);
-
-            setTimeout(() => {
-                queryClient.invalidateQueries({ queryKey: ['order', id] });
-            }, 1000);
+            queryClient.invalidateQueries({ queryKey: ['order', id] });
         },
         onError: () => {
+
         }
     })
 
@@ -88,14 +86,13 @@ const OrderDetailsPage = () => {
 
 
 
-    if (isFetching) return <Loader />
+    if (isLoading) return <Loader />
 
     return (
 
         <Context.Provider value={contextValue}>
             {contextHolder}
             <div>
-                <ConfirmOrderModal id={id || ''} open={confirmOrderModalOpen} setOpen={setConfirmOrderModalOpen} />
                 <OrderHeader orderStatus={orderData?.data?.orderStatus} />
 
                 <Flex gap={16} style={{ marginTop: '10px' }}>
@@ -130,7 +127,7 @@ const OrderDetailsPage = () => {
                                             okButtonProps={{ loading: isPending }}
                                         >
                                             <Button danger>
-                                                {getOrderStatusButtonText}
+                                                Confirm
                                             </Button>
                                         </Popconfirm>
 
@@ -140,7 +137,7 @@ const OrderDetailsPage = () => {
 
                             {/* Button to change the status of order after confiming order with popconfirm modal */}
 
-                            <Row justify="end">
+                            {orderData?.data?.isConfirmed && <Row justify="end">
                                 <Popconfirm
                                     title={getOrderStatusButtonText}
                                     description={getOrderStatusAlertText}
@@ -155,7 +152,13 @@ const OrderDetailsPage = () => {
                                         {getOrderStatusButtonText}
                                     </Button>
                                 </Popconfirm>
-                            </Row>
+                            </Row>}
+
+                            {/* If Order Delivered then show date and time of delivery */}
+                            {orderData?.data?.isDelivered && <Row justify="end">
+                                <Typography.Text strong>Delivered on&nbsp;&nbsp;</Typography.Text>
+                                <Tag color="orange" >{new Date(orderData?.data?.updatedAt).toLocaleString()}</Tag>
+                            </Row>}
 
 
                         </div>
@@ -186,7 +189,7 @@ const OrderDetailsPage = () => {
                             <Row gutter={16}>
                                 <Col span={24}>
                                     <h3>Payment Method</h3>
-                                    <p style={{ textTransform: 'capitalize' }}>{orderData?.data?.paymentMethod}</p>
+                                    <Tag style={{ textTransform: 'uppercase', }}>{orderData?.data?.paymentMethod}</Tag>
                                 </Col>
                             </Row>
                         </Card>

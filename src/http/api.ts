@@ -154,3 +154,15 @@ export const confirmOrder = async (id: string) => {
 export const updateOrderStatus = async (id: string, status: string) => {
     return api.patch(`${ORDER_SERVICE}/order/status/${id}`, { status });
 }
+
+export const getTotalOrdersSales = async () => {
+    return api.get(`${ORDER_SERVICE}/order/total-order-sale`);
+}
+
+export const getRecentOrders = async () => {
+    return api.get(`${ORDER_SERVICE}/order/recent-orders`);
+}
+
+export const getSalesReport = async () => {
+    return api.get(`${ORDER_SERVICE}/order/sales-report`);
+}
